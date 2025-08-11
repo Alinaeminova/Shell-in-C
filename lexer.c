@@ -84,30 +84,6 @@ char *lexer_read_quotation(Lexer *lexer, char quote) {
     return value;
 }
 
-Token *lexer_read_redirection(Lexer *lexer, TokenType type) {
-    lexer->position++;
-    if (type == TOKEN_APPEND_REDIR) ++lexer->position;
-    skip_whitespace(lexer);
-
-    if (lexer->position >= lexer->length) {
-        fprintf(stderr, "Error: expected file after redirection operator\n");
-        exit(EXIT_FAILURE);
-    }
-
-    char *filename;
-    char current = lexer->input[lexer->position];
-
-    if (current == '"' || current == '\'') {
-        filename = lexer_read_quotation(lexer, current);
-    }
-    else filename = lexer_read_word(lexer);
-
-    Token *token = malloc(sizeof(Token));
-    token->type = type;
-    token->value = filename;
-    return token;
-}
-
 Token *lexer_next_token(Lexer *lexer) {
     skip_whitespace(lexer);
 
@@ -147,7 +123,11 @@ Token *lexer_next_token(Lexer *lexer) {
             return token;
         }
         if (current == '>' && next == '>') {
-            return lexer_read_redirection(lexer, TOKEN_APPEND_REDIR);
+            Token *token = malloc(sizeof(Token));
+            token->type = TOKEN_APPEND_REDIR;
+            token->value = NULL;
+            lexer->position += 2;
+            return token;
         }
     }
 
@@ -171,9 +151,17 @@ Token *lexer_next_token(Lexer *lexer) {
             lexer->position++;
             return semi_token;
         case '<':
-            return lexer_read_redirection(lexer, TOKEN_INPUT_REDIR);
+            Token *input_token = malloc(sizeof(Token));
+            input_token->type = TOKEN_INPUT_REDIR;
+            input_token->value = NULL;
+            lexer->position++;
+            return input_token;
         case '>':
-            return lexer_read_redirection(lexer, TOKEN_OUTPUT_REDIR);
+            Token *output_token = malloc(sizeof(Token));
+            output_token->type = TOKEN_OUTPUT_REDIR;
+            output_token->value = NULL;
+            lexer->position++;
+            return output_token;
         case '(':
             Token *lparen_token = malloc(sizeof(Token));
             lparen_token->type = TOKEN_LPAREN;
@@ -220,9 +208,9 @@ void test_lexer(const char *input) {
             case TOKEN_PIPE: printf("PIPE"); break;
             case TOKEN_BACKGROUND: printf("BACKGROUND"); break;
             case TOKEN_SEMICOLON: printf("SEMICOLON"); break;
-            case TOKEN_INPUT_REDIR: printf("INPUT_REDIR '%s'", token->value); break;
-            case TOKEN_OUTPUT_REDIR: printf("OUTPUT_REDIR '%s'", token->value); break;
-            case TOKEN_APPEND_REDIR: printf("APPEND_REDIR '%s'", token->value); break;
+            case TOKEN_INPUT_REDIR: printf("INPUT_REDIR"); break;
+            case TOKEN_OUTPUT_REDIR: printf("OUTPUT_REDIR"); break;
+            case TOKEN_APPEND_REDIR: printf("APPEND_REDIR"); break;
             case TOKEN_LPAREN: printf("LPAREN"); break;
             case TOKEN_RPAREN: printf("RPAREN"); break;
             default: printf("UNKNOWN"); break;
