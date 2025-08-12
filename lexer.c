@@ -2,32 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
-typedef enum {
-    TOKEN_COMMAND,
-    TOKEN_PIPE,
-    TOKEN_INPUT_REDIR,
-    TOKEN_OUTPUT_REDIR,
-    TOKEN_APPEND_REDIR,
-    TOKEN_AND,
-    TOKEN_OR,
-    TOKEN_SEMICOLON,
-    TOKEN_BACKGROUND,
-    TOKEN_LPAREN,
-    TOKEN_RPAREN,
-    TOKEN_EOF
-} TokenType;
-
-typedef struct {
-    TokenType type;
-    char *value;
-} Token;
-
-typedef struct {
-    const char *input;
-    int position;
-    int length;
-} Lexer;
+#include "lexer.h"
 
 Lexer *lexer_init(const char *input) {
     Lexer *lexer = malloc(sizeof(Lexer));
