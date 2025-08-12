@@ -197,11 +197,14 @@ void free_token(Token *token) {
 void test_lexer(const char *input) {
     Lexer *lexer = lexer_init(input);
     Token *token;
+    int token_type;
 
     printf("Lexer string testing: \"%s\"\n", input);
-    while ((token = lexer_next_token(lexer))->type != TOKEN_EOF) {
+    do {
+        token = lexer_next_token(lexer);
+        token_type = token->type;
         printf("Token: ");
-        switch (token->type) {
+        switch (token_type) {
             case TOKEN_COMMAND: printf("COMMAND '%s'", token->value); break;
             case TOKEN_AND: printf("AND"); break;
             case TOKEN_OR: printf("OR"); break;
@@ -213,13 +216,13 @@ void test_lexer(const char *input) {
             case TOKEN_APPEND_REDIR: printf("APPEND_REDIR"); break;
             case TOKEN_LPAREN: printf("LPAREN"); break;
             case TOKEN_RPAREN: printf("RPAREN"); break;
+            case TOKEN_EOF: printf("EOF"); break;
             default: printf("UNKNOWN"); break;
         }
         printf("\n");
         free_token(token);
-    }
+    } while (token_type != TOKEN_EOF);
     printf("\n");
-    free_token(token);
     free_lexer(lexer);
 }
 
