@@ -1,3 +1,6 @@
+#ifndef LEXER_H
+#define LEXER_H
+
 typedef enum {
     TOKEN_COMMAND,
     TOKEN_PIPE,
@@ -32,3 +35,5 @@ char *lexer_read_quotation(Lexer *lexer, char quote);
 Token *lexer_next_token(Lexer *lexer);
 void free_token(Token *token);
 void test_lexer(const char *input);
+
+#endif
