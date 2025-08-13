@@ -1,8 +1,8 @@
+#include "lexer.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "lexer.h"
 
 Lexer *lexer_init(const char *input) {
     Lexer *lexer = malloc(sizeof(Lexer));
@@ -169,43 +169,43 @@ void free_token(Token *token) {
     free(token);
 }
 
-void test_lexer(const char *input) {
-    Lexer *lexer = lexer_init(input);
-    Token *token;
-    int token_type;
+// void test_lexer(const char *input) {
+//     Lexer *lexer = lexer_init(input);
+//     Token *token;
+//     int token_type;
 
-    printf("Lexer string testing: \"%s\"\n", input);
-    do {
-        token = lexer_next_token(lexer);
-        token_type = token->type;
-        printf("Token: ");
-        switch (token_type) {
-            case TOKEN_COMMAND: printf("COMMAND '%s'", token->value); break;
-            case TOKEN_AND: printf("AND"); break;
-            case TOKEN_OR: printf("OR"); break;
-            case TOKEN_PIPE: printf("PIPE"); break;
-            case TOKEN_BACKGROUND: printf("BACKGROUND"); break;
-            case TOKEN_SEMICOLON: printf("SEMICOLON"); break;
-            case TOKEN_INPUT_REDIR: printf("INPUT_REDIR"); break;
-            case TOKEN_OUTPUT_REDIR: printf("OUTPUT_REDIR"); break;
-            case TOKEN_APPEND_REDIR: printf("APPEND_REDIR"); break;
-            case TOKEN_LPAREN: printf("LPAREN"); break;
-            case TOKEN_RPAREN: printf("RPAREN"); break;
-            case TOKEN_EOF: printf("EOF"); break;
-            default: printf("UNKNOWN"); break;
-        }
-        printf("\n");
-        free_token(token);
-    } while (token_type != TOKEN_EOF);
-    printf("\n");
-    free_lexer(lexer);
-}
+//     printf("Lexer string testing: \"%s\"\n", input);
+//     do {
+//         token = lexer_next_token(lexer);
+//         token_type = token->type;
+//         printf("Token: ");
+//         switch (token_type) {
+//             case TOKEN_COMMAND: printf("COMMAND '%s'", token->value); break;
+//             case TOKEN_AND: printf("AND"); break;
+//             case TOKEN_OR: printf("OR"); break;
+//             case TOKEN_PIPE: printf("PIPE"); break;
+//             case TOKEN_BACKGROUND: printf("BACKGROUND"); break;
+//             case TOKEN_SEMICOLON: printf("SEMICOLON"); break;
+//             case TOKEN_INPUT_REDIR: printf("INPUT_REDIR"); break;
+//             case TOKEN_OUTPUT_REDIR: printf("OUTPUT_REDIR"); break;
+//             case TOKEN_APPEND_REDIR: printf("APPEND_REDIR"); break;
+//             case TOKEN_LPAREN: printf("LPAREN"); break;
+//             case TOKEN_RPAREN: printf("RPAREN"); break;
+//             case TOKEN_EOF: printf("EOF"); break;
+//             default: printf("UNKNOWN"); break;
+//         }
+//         printf("\n");
+//         free_token(token);
+//     } while (token_type != TOKEN_EOF);
+//     printf("\n");
+//     free_lexer(lexer);
+// }
 
-int main() {
-    test_lexer("echo 'Hello, world'");
-    test_lexer("ls -l");
-    test_lexer("ls -l | grep \"test\" > output.txt && (cd dir; ls) &");
-    test_lexer("cat < input.txt | sort | uniq >> 'output file.txt' || echo \"Error\"");
-    test_lexer("(ps aux; ls -a) && pwd");
-    return 0;
-}
+// int main() {
+//     test_lexer("echo 'Hello, world'");
+//     test_lexer("ls -l");
+//     test_lexer("ls -l | grep \"test\" > output.txt && (cd dir; ls) &");
+//     test_lexer("cat < input.txt | sort | uniq >> 'output file.txt' || echo \"Error\"");
+//     test_lexer("(ps aux; ls -a) && pwd");
+//     return 0;
+// }
