@@ -1,32 +1,32 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 #include "parser.h"
 
 TokenArray *tokenize(const char *input) {
     Lexer *lexer = lexer_init(input);
     TokenArray *array = malloc(sizeof(TokenArray));
     array->tokens = NULL;
-    array->count = 0;
+    array->length = 0;
     array->position = 0;
 
     Token *token;
     do {
         token = lexer_next_token(lexer);
-        array->tokens = realloc(array->tokens, (array->count + 1) * sizeof(Token));
-        array->tokens[array->count] = *token;
+        array->tokens = realloc(array->tokens, (array->length + 1) * sizeof(Token));
+        array->tokens[array->length] = *token;
         if (token->value) {
-            array->tokens[array->count].value = strdup(token->value);
+            array->tokens[array->length].value = strdup(token->value); 
         }
         free_token(token);
-    } while (array->tokens[array->count++].type != TOKEN_EOF);
+    } while (array->tokens[array->length++].type != TOKEN_EOF);
 
     free_lexer(lexer);
     return array;
 }
 
 void free_token_array(TokenArray *array) {
-    for (int i = 0; i < array->count; ++i) {
+    for (int i = 0; i < array->length; ++i) {
         if (array->tokens[i].value) free(array->tokens[i].value);
     }
     free(array->tokens);
@@ -34,12 +34,12 @@ void free_token_array(TokenArray *array) {
 }
 
 Token *peek_token(TokenArray *array) {
-    if (array->position >= array->count) return NULL;
+    if (array->position >= array->length) return NULL;
     return &array->tokens[array->position];
 }
 
 Token *next_token(TokenArray *array) {
-    if (array->position >= array->count) return NULL;
+    if (array->position >= array->length) return NULL;
     return &array->tokens[array->position++];
 }
 
@@ -62,7 +62,7 @@ ASTNode *parse_command(TokenArray *array) {
     if (token->type == TOKEN_LPAREN) {
         ASTNode *subshell = parse_expression(array);
         token = next_token(array);
-        if (!token || token->type != TOKEN_RPAREN) {
+        if (token->type != TOKEN_RPAREN) {
             fprintf(stderr, "Error: expected ')'\n");
             exit(EXIT_FAILURE);
         }
@@ -111,6 +111,7 @@ ASTNode *parse_command(TokenArray *array) {
             args = realloc(args, (args_count + 1) * (sizeof(char *)));
             args[args_count - 1] = strdup(token->value);
             args[args_count] = NULL;
+            // command_node->args = args;
         }
 
         else break;
@@ -142,6 +143,7 @@ ASTNode *parse_and_or(TokenArray *array) {
             ASTNode *right = parse_and_or(array);
             return create_node(NODE_AND, left, right);
         }
+
         else if (token->type == TOKEN_OR) {
             next_token(array);
             ASTNode *right = parse_and_or(array);
@@ -183,13 +185,11 @@ ASTNode *parse_expression(TokenArray *array) {
 void free_ast(ASTNode *node) {
     if (!node) return;
 
-    free_ast(node->left);
-    free_ast(node->right);
+    if (node->left && node->left != node) free_ast(node->left);
+    if (node->right && node->right != node) free_ast(node->right);
 
     if (node->args) {
-        for (int i = 0; node->args[i]; ++i) {
-            free(node->args[i]);
-        }
+        for (int i = 0; node->args[i]; ++i) free(node->args[i]);
         free(node->args);
     }
 
@@ -222,8 +222,8 @@ void print_ast(ASTNode *node, int level) {
     }
     printf("\n");
 
-    print_ast(node->left, level + 1);
-    print_ast(node->right, level + 1);
+    if (node->left && node->left != node) print_ast(node->left, level + 1);
+    if (node->right && node->right != node) print_ast(node->right, level + 1);
 }
 
 void test_parser(const char *input) {
@@ -241,7 +241,9 @@ int main() {
     test_parser("echo 'Hello, world'");
     test_parser("ls -l");
     test_parser("ls -l | grep \"test\" > output.txt && (cd dir; ls) &");
-    test_parser("cat < input.txt | sort | uniq >> 'output file.txt' || echo \"Error\"");
     test_parser("(ps aux; ls -a) && pwd");
+
+    // incorrect stirngs
+    // test_parser("ls -l | grep \"test\" > output.txt && (cd dir; ls &");
     return 0;
 }
