@@ -1,7 +1,7 @@
-#include "parser.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "parser.h"
 
 TokenArray *tokenize(const char *input) {
     Lexer *lexer = lexer_init(input);
@@ -18,9 +18,8 @@ TokenArray *tokenize(const char *input) {
         if (token->value) {
             array->tokens[array->count].value = strdup(token->value);
         }
-        ++array->count;
         free_token(token);
-    } while (array->tokens[array->count - 1].type != TOKEN_EOF);
+    } while (array->tokens[array->count++].type != TOKEN_EOF);
 
     free_lexer(lexer);
     return array;
@@ -174,6 +173,10 @@ ASTNode *parse_sequence_background(TokenArray *array) {
 }
 
 ASTNode *parse_expression(TokenArray *array) {
+    Token *token = peek_token(array);
+    if (!token || token->type == TOKEN_EOF) {
+        return NULL;
+    }
     return parse_sequence_background(array);
 }
 
@@ -234,6 +237,7 @@ void test_parser(const char *input) {
 }
 
 int main() {
+    test_parser("");
     test_parser("echo 'Hello, world'");
     test_parser("ls -l");
     test_parser("ls -l | grep \"test\" > output.txt && (cd dir; ls) &");

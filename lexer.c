@@ -1,8 +1,8 @@
-#include "lexer.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "lexer.h"
 
 Lexer *lexer_init(const char *input) {
     Lexer *lexer = malloc(sizeof(Lexer));
@@ -45,10 +45,10 @@ char *lexer_read_quotation(Lexer *lexer, char quote) {
         lexer->position++;
     }
 
-    if (lexer->position >= lexer->length) {
-        fprintf(stderr, "Error: unclosed quotation mark\n");
-        exit(EXIT_FAILURE);
-    }
+    // if (lexer->position >= lexer->length) {
+    //     fprintf(stderr, "Error: unclosed quotation mark\n");
+    //     exit(EXIT_FAILURE);
+    // }
 
     int length = lexer->position - start;
     lexer->position++;
