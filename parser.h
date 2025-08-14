@@ -5,7 +5,7 @@
 
 typedef struct {
     Token *tokens;
-    int count;
+    int length;
     int position;
 } TokenArray;
 
@@ -35,10 +35,6 @@ typedef struct ASTNode {
     int append;
 } ASTNode;
 
-TokenArray *tokenize(const char *input);
-void free_token_array(TokenArray *array);
-Token *peek_token(TokenArray *array);
-Token *next_token(TokenArray *array);
 ASTNode *create_node(NodeType type, ASTNode *left, ASTNode *right);
 ASTNode *parse_command(TokenArray *array);
 ASTNode *parse_pipeline(TokenArray *array);
