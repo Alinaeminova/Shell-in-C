@@ -9,6 +9,9 @@ typedef struct {
     int position;
 } TokenArray;
 
+bool has_unclosed_quotes(const char *str);
+bool has_imbalanced_brackets(const char *str);
+
 TokenArray *tokenize(const char *input);
 void free_token_array(TokenArray *array);
 Token *peek_token(TokenArray *array);

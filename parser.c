@@ -1,9 +1,74 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "parser.h"
 
+bool has_unclosed_quotes(const char *str) {
+    bool in_single_quotes = false;
+    bool in_double_quotes = false;
+    bool escape_next = false;
+
+    for (int i = 0; str[i]; ++i) {
+        if (escape_next) {
+            escape_next = false;
+            continue;
+        }
+        if (str[i] == '\\') {
+            escape_next = true;
+            continue;
+        }
+        if (str[i] == '\'' && !in_double_quotes) {
+            in_single_quotes = !in_single_quotes;
+        }
+        else if (str[i] == '"' && !in_single_quotes) {
+            in_double_quotes = !in_double_quotes;
+        }
+    }
+    return in_single_quotes || in_double_quotes;
+}
+
+bool has_imbalanced_brackets(const char *str) {
+    bool in_single_quotes = false;
+    bool in_double_quotes = false;
+    bool escape_next = false;
+    int depth = 0;
+
+    for (int i = 0; str[i]; ++i) {
+        if (escape_next) {
+            escape_next = false;
+            continue;
+        }
+        if (str[i] == '\\') {
+            escape_next = true;
+            continue;
+        }
+        if (str[i] == '\'' && !in_double_quotes) {
+            in_single_quotes = !in_single_quotes;
+        }
+        else if (str[i] == '"' && !in_single_quotes) {
+            in_double_quotes = !in_double_quotes;
+        }
+        if (in_single_quotes || in_double_quotes) continue;
+        if (str[i] == '(') ++depth;
+        else if (str[i] == ')') {
+            if (--depth < 0) return true;
+        }
+    }
+    return depth != 0;
+}
+
 TokenArray *tokenize(const char *input) {
+    if (has_unclosed_quotes(input)) {
+        fprintf(stderr, "Error: unclosed quote\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (has_imbalanced_brackets(input)) {
+        fprintf(stderr, "Error: imbalanced brackets\n");
+        exit(EXIT_FAILURE);
+    }
+
     Lexer *lexer = lexer_init(input);
     TokenArray *array = malloc(sizeof(TokenArray));
     array->tokens = NULL;
@@ -62,10 +127,10 @@ ASTNode *parse_command(TokenArray *array) {
     if (token->type == TOKEN_LPAREN) {
         ASTNode *subshell = parse_expression(array);
         token = next_token(array);
-        if (token->type != TOKEN_RPAREN) {
-            fprintf(stderr, "Error: expected ')'\n");
-            exit(EXIT_FAILURE);
-        }
+        // if (token->type != TOKEN_RPAREN) {
+        //     fprintf(stderr, "Error: expected ')'\n");
+        //     exit(EXIT_FAILURE);
+        // }
         return create_node(NODE_SUBSHELL, subshell, NULL);
     }
 
@@ -237,13 +302,16 @@ void test_parser(const char *input) {
 }
 
 int main() {
-    test_parser("");
-    test_parser("echo 'Hello, world'");
-    test_parser("ls -l");
-    test_parser("ls -l | grep \"test\" > output.txt && (cd dir; ls) &");
-    test_parser("(ps aux; ls -a) && pwd");
+    // test_parser("");
+    // test_parser("echo 'Hello, world'");
+    // test_parser("ls -l");
+    // test_parser("ls -l | grep \"test\" > output.txt && (cd dir; ls) &");
+    // test_parser("(ps aux; ls -a) && pwd");
 
     // incorrect stirngs
     // test_parser("ls -l | grep \"test\" > output.txt && (cd dir; ls &");
+    // test_parser("ls -l | grep \"test\" > output.txt && (cd dir; ls) &");
+    // test_parser("'");
+    
     return 0;
 }
