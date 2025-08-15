@@ -302,11 +302,11 @@ void test_parser(const char *input) {
 }
 
 int main() {
-    // test_parser("");
-    // test_parser("echo 'Hello, world'");
-    // test_parser("ls -l");
-    // test_parser("ls -l | grep \"test\" > output.txt && (cd dir; ls) &");
-    // test_parser("(ps aux; ls -a) && pwd");
+    test_parser("");
+    test_parser("echo 'Hello, world'");
+    test_parser("ls -l");
+    test_parser("ls -l | grep \"test\" > output.txt && (cd dir; ls) &");
+    test_parser("(ps aux; ls -a) && pwd");
 
     // incorrect stirngs
     // test_parser("ls -l | grep \"test\" > output.txt && (cd dir; ls &");
