@@ -127,10 +127,6 @@ ASTNode *parse_command(TokenArray *array) {
     if (token->type == TOKEN_LPAREN) {
         ASTNode *subshell = parse_expression(array);
         token = next_token(array);
-        // if (token->type != TOKEN_RPAREN) {
-        //     fprintf(stderr, "Error: expected ')'\n");
-        //     exit(EXIT_FAILURE);
-        // }
         return create_node(NODE_SUBSHELL, subshell, NULL);
     }
 
@@ -176,7 +172,7 @@ ASTNode *parse_command(TokenArray *array) {
             args = realloc(args, (args_count + 1) * (sizeof(char *)));
             args[args_count - 1] = strdup(token->value);
             args[args_count] = NULL;
-            // command_node->args = args;
+            command_node->args = args;
         }
 
         else break;
@@ -307,6 +303,7 @@ int main() {
     test_parser("ls -l");
     test_parser("ls -l | grep \"test\" > output.txt && (cd dir; ls) &");
     test_parser("(ps aux; ls -a) && pwd");
+    test_parser("ls -lah --color=auto --sort=size");
 
     // incorrect stirngs
     // test_parser("ls -l | grep \"test\" > output.txt && (cd dir; ls &");
