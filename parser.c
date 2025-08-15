@@ -199,19 +199,13 @@ ASTNode *parse_and_or(TokenArray *array) {
 
     Token *token = peek_token(array);
     if (token) {
-        if (token->type == TOKEN_AND) {
+        if (token->type == TOKEN_AND || token->type == TOKEN_OR) {
+            NodeType op_type = (token->type == TOKEN_AND) ? NODE_AND : NODE_OR;
             next_token(array);
             ASTNode *right = parse_and_or(array);
-            return create_node(NODE_AND, left, right);
-        }
-
-        else if (token->type == TOKEN_OR) {
-            next_token(array);
-            ASTNode *right = parse_and_or(array);
-            return create_node(NODE_OR, left, right);
+            return create_node(op_type, left, right);
         }
     }
-
     return left;
 }
 
@@ -298,17 +292,19 @@ void test_parser(const char *input) {
 }
 
 int main() {
-    test_parser("");
-    test_parser("echo 'Hello, world'");
-    test_parser("ls -l");
-    test_parser("ls -l | grep \"test\" > output.txt && (cd dir; ls) &");
-    test_parser("(ps aux; ls -a) && pwd");
-    test_parser("ls -lah --color=auto --sort=size");
+    // test_parser("");
+    // test_parser("echo 'Hello, world'");
+    // test_parser("ls -l");
+    // test_parser("ls -l | grep \"test\" > output.txt && (cd dir; ls) &");
+    // test_parser("(ps aux; ls -a) && pwd");
+    // test_parser("ls -lah --color=auto --sort=size");
 
     // incorrect stirngs
     // test_parser("ls -l | grep \"test\" > output.txt && (cd dir; ls &");
     // test_parser("ls -l | grep \"test\" > output.txt && (cd dir; ls) &");
     // test_parser("'");
+    test_parser("cat < input.txt | sort | uniq >> 'output file.txt' || echo \"Error\"");
+    test_parser("ps && ls || ls");
     
     return 0;
 }
