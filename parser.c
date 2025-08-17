@@ -219,12 +219,29 @@ ASTNode *parse_sequence_background(TokenArray *array) {
     while ((token = peek_token(array))) {
         if (token->type == TOKEN_SEMICOLON) {
             next_token(array);
-            ASTNode *right = parse_and_or(array);
-            left = create_node(NODE_SEQUENCE, left, right);
+            Token *next = peek_token(array);
+            if (next && next->type != TOKEN_EOF) {
+                ASTNode *right = parse_and_or(array);
+                if (right) {
+                    left = create_node(NODE_SEQUENCE, left, right);
+                }
+            }
+            else break;
         }
         else if (token->type == TOKEN_BACKGROUND) {
             next_token(array);
-            left = create_node(NODE_BACKGROUND, left, NULL);
+            Token *next = peek_token(array);
+            if (next && next->type != TOKEN_EOF) {
+                if (next->type == TOKEN_SEMICOLON) {
+                   fprintf(stderr, "Error: unexpected token after '&'\n");
+                    exit(EXIT_FAILURE);
+                }
+                ASTNode *right = parse_and_or(array);
+                if (right) {
+                    left = create_node(NODE_SEQUENCE, create_node(NODE_BACKGROUND, left, NULL), right);
+                }
+            }
+            else left = create_node(NODE_BACKGROUND, left, NULL);
         }
         else break;
     }
@@ -296,18 +313,20 @@ void test_parser(const char *input) {
 int main() {
     test_parser("cat < input.txt | sort | uniq >> 'output file.txt' || echo \"Error\"");
     test_parser("ps && ls || ls");
-    test_parser("ls1; ls2; ls3 &");
+    test_parser("ls; ls; ls &");
     test_parser("");
     test_parser("echo 'Hello, world'");
     test_parser("ls -l");
     test_parser("ls -l | grep \"test\" > output.txt && (cd dir; ls) &");
     test_parser("(ps aux; ls -a) && pwd");
     test_parser("ls -lah --color=auto --sort=size");
+    test_parser("ls -l | grep \"test\" > output.txt & (cd dir; ls)");
 
-    // incorrect stirngs
+    // incorrect strings
     // test_parser("ls -l | grep \"test\" > output.txt && (cd dir; ls &");
     // test_parser("ls -l | grep \"test\" > output.txt && cd dir; ls) &");
     // test_parser("'");
+    // test_parser("ls & ; ls &");
     
     return 0;
 }
