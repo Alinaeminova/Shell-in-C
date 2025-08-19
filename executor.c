@@ -6,9 +6,7 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <fcntl.h>
-#include "parser.h"
-
-#define MAX_COMMAND_LENGTH 1024
+#include "executor.h"
 
 void execute_cd(ASTNode *node) {
     if (chdir(node->args[1])) perror("cd failed");
