@@ -309,24 +309,3 @@ void test_parser(const char *input) {
     free_token_array(tokens);
     printf("\n");
 }
-
-int main() {
-    test_parser("cat < input.txt | sort | uniq >> 'output file.txt' || echo \"Error\"");
-    test_parser("ps && ls || ls");
-    test_parser("ls; ls; ls &");
-    test_parser("");
-    test_parser("echo 'Hello, world'");
-    test_parser("ls -l");
-    test_parser("ls -l | grep \"test\" > output.txt && (cd dir; ls) &");
-    test_parser("(ps aux; ls -a) && pwd");
-    test_parser("ls -lah --color=auto --sort=size");
-    test_parser("ls -l | grep \"test\" > output.txt & (cd dir; ls)");
-
-    // incorrect strings
-    // test_parser("ls -l | grep \"test\" > output.txt && (cd dir; ls &");
-    // test_parser("ls -l | grep \"test\" > output.txt && cd dir; ls) &");
-    // test_parser("'");
-    // test_parser("ls & ; ls &");
-    
-    return 0;
-}
