@@ -2,6 +2,7 @@
 #define EXECUTOR_H
 
 #include "parser.h"
+#include "lexer.h"
 
 #define MAX_COMMAND_LENGTH 1024
 
