@@ -1,6 +1,7 @@
 #ifndef PARSER_H
 #define PARSER_H
 
+#include <stdbool.h>
 #include "lexer.h"
 
 typedef struct {
@@ -20,7 +21,6 @@ Token *next_token(TokenArray *array);
 typedef enum {
     NODE_COMMAND,
     NODE_PIPE,
-    NODE_REDIRECTION,
     NODE_AND,
     NODE_OR,
     NODE_SEQUENCE,

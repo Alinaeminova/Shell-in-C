@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 #include "parser.h"
 
 bool has_unclosed_quotes(const char *str) {

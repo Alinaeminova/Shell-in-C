@@ -1,15 +1,34 @@
-myshell: executor.o parser.o lexer.o
-	gcc -o myshell executor.o parser.o lexer.o
-	rm -f *.o
+CC = gcc
+CFLAGS = -Wall -Wextra -std=c11 -I./include -D_POSIX_C_SOURCE=200809L
+LDFLAGS = 
+TARGET = myshell
 
-executor.o: executor.c executor.h parser.h lexer.h
-	gcc -c executor.c
+SRCS = $(wildcard src/*.c)
+OBJS = $(SRCS:src/%.c=build/%.o)
 
-parser.o: parser.c parser.h lexer.h
-	gcc -c parser.c
+$(shell mkdir -p build)
 
-lexer.o: lexer.c lexer.h
-	gcc -c lexer.c
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CC) $(OBJS) -o $@ $(LDFLAGS)
+
+build/lexer.o: src/lexer.c include/lexer.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+build/parser.o: src/parser.c include/parser.h include/lexer.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+build/executor.o: src/executor.c include/executor.h include/parser.h include/lexer.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+build:
+	mkdir -p build
 
 clean:
-	rm -f *.o myshell
+	rm -rf build $(TARGET)
+
+run: $(TARGET)
+	./$(TARGET)
+
+.PHONY: all clean run
