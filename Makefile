@@ -1,6 +1,9 @@
-myshell: parser.o lexer.o
-	gcc -o myshell parser.o lexer.o
+myshell: executor.o parser.o lexer.o
+	gcc -o myshell executor.o parser.o lexer.o
 	rm -f *.o
+
+executor.o: executor.c parser.h
+	gcc -c executor.c
 
 parser.o: parser.c lexer.h
 	gcc -c parser.c
