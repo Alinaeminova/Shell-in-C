@@ -194,12 +194,3 @@ void test_lexer(const char *input) {
     printf("\n");
     free_lexer(lexer);
 }
-
-// int main() {
-//     test_lexer("echo 'Hello, world'");
-//     test_lexer("ls -l");
-//     test_lexer("ls -l | grep \"test\" > output.txt && (cd dir; ls) &");
-//     test_lexer("cat < input.txt | sort | uniq >> 'output file.txt' || echo \"Error\"");
-//     test_lexer("(ps aux; ls -a) && pwd");
-//     return 0;
-// }
